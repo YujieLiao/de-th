@@ -6,12 +6,12 @@ Consumer 1: A kafka consumer in process.py reads raw data from the user-login to
 Producer: Aggregated data comes from consumer 1. Processed data is published to a new Kafka topic, processed-user-login.
 Consumer 2: In analysis.py, a kafka consumer subscrib to processed-user-login topic and consume data for real-time analysis. It merges incoming aggregated data with historical data in memory for real-time analysis, such as identifying the most popular locale or app version. For further process, the data can saved to SQL database and connect to Tableau for data visualization. 
 
-### Command to consume message from tpoic processed-user-login inside kafka container:
-docker exec -it de-th-kafka-1 /bin/bash 
-<br> kafka-console-consumer --bootstrap-server localhost:9092 --topic processed-user-login
-<br> or
-<br> kafka-console-consumer --bootstrap-server localhost:9092 --topic processed-user-login --from-beginning if you want to have information from beginning
-<br> This will allow you to see the aggregated data in processed-user-login topic.
+### How to run this project 
+'docker-compose up' -- run the docker and you will see the row data on console.
+<br> 'python process.py' -- run the consumer to consumer data from user-login topic
+<br>'docker exec -it de-th-kafka-1 /bin/bash' and 'kafka-console-consumer --bootstrap-server localhost:9092 --topic processed-user-login' -- this allows you to check processed data in processed-user-login.
+<br> 'kafka-console-consumer --bootstrap-server localhost:9092 --topic processed-user-login --from-beginning' -- if you want to have information from beginning
+<br> 'python analysis.py' -- run the consumer to consumer data from processed-user-login to merge data with historical data for real-time analysis. It analyzes the most polular device type, most popular state, and which state has the most/lease user login. 
 
 ### Design Choices
 1. Architecture
