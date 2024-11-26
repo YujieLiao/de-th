@@ -2,15 +2,16 @@
 ## Kafka Data Processing Pipeline
 ### Overview:
 This project implements a Kafka-based data processing pipeline with the following features:
-Consumer 1: A kafka consumer reads raw data from the user-login topic, aggregates data in batches of 20 messages, extracting fields like app_version, locale, and device_type.
+Consumer 1: A kafka consumer in process.py reads raw data from the user-login topic, aggregates data in batches of 20 messages, extracting fields like app_version, locale, and device_type.
 Producer: Aggregated data comes from consumer 1. Processed data is published to a new Kafka topic, processed-user-login.
-Consumer 2: A kafka consumer subscrib to processed-user-login topic and consume data for real-time analysis. It merges incoming aggregated data with historical data in memory for real-time analysis, such as identifying the most popular locale or app version.
+Consumer 2: In analysis.py, a kafka consumer subscrib to processed-user-login topic and consume data for real-time analysis. It merges incoming aggregated data with historical data in memory for real-time analysis, such as identifying the most popular locale or app version. For further process, the data can saved to SQL database and connect to Tableau for data visualization. 
 
 ### Command to consume message from tpoic processed-user-login inside kafka container:
 docker exec -it de-th-kafka-1 /bin/bash 
 <br> kafka-console-consumer --bootstrap-server localhost:9092 --topic processed-user-login
 <br> or
 <br> kafka-console-consumer --bootstrap-server localhost:9092 --topic processed-user-login --from-beginning if you want to have information from beginning
+<br> This will allow you to see the aggregated data in processed-user-login topic.
 
 ### Design Choices
 1. Architecture
