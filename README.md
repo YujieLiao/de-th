@@ -2,22 +2,26 @@
 ## Kafka Data Processing Pipeline
 ### Overview:
 This project implements a Kafka-based data processing pipeline with the following features:
-Consumer 1: A kafka consumer in process.py reads raw data from the user-login topic, aggregates data in batches of 20 messages, extracting fields like app_version, locale, and device_type.
-Producer: Aggregated data comes from consumer 1. Processed data is published to a new Kafka topic, processed-user-login.
-Consumer 2: In analysis.py, a kafka consumer subscrib to processed-user-login topic and consume data for real-time analysis. It merges incoming aggregated data with historical data in memory for real-time analysis, such as identifying the most popular locale or app version. For further process, the data can saved to SQL database and connect to Tableau for data visualization. 
+<br> Consumer 1: A kafka consumer in process.py reads raw data from the user-login topic, aggregates data in batches of 20 messages, extracting fields like app_version, locale, and device_type.
+<br> Producer: Aggregated data comes from consumer 1. Processed data is published to a new Kafka topic, processed-user-login.
+<br> Consumer 2: In analysis.py, a kafka consumer subscribes to processed-user-login topic and consumes data for real-time analysis. It merges incoming aggregated data with historical data in memory for real-time analysis, such as identifying the most popular locale or app version. For further process, the data can saved to SQL database and connect to Tableau for data visualization. 
 
 ### How to run this project 
 'docker-compose up' -- run the docker and you will see the row data on console.
 <br> 'python process.py' -- run the consumer to consumer data from user-login topic
-<br>'docker exec -it de-th-kafka-1 /bin/bash' and 'kafka-console-consumer --bootstrap-server localhost:9092 --topic processed-user-login' -- this allows you to check processed data in processed-user-login.
-<br> 'kafka-console-consumer --bootstrap-server localhost:9092 --topic processed-user-login --from-beginning' -- if you want to have information from beginning
+<!-- <br>'docker exec -it de-th-kafka-1 /bin/bash' and 'kafka-console-consumer --bootstrap-server localhost:9092 --topic processed-user-login' -- this allows you to check processed data in processed-user-login.
+<br> 'kafka-console-consumer --bootstrap-server localhost:9092 --topic processed-user-login --from-beginning' -- if you want to have information from beginning -->
 <br> 'python analysis.py' -- run the consumer to consumer data from processed-user-login to merge data with historical data for real-time analysis. It analyzes the most polular device type, most popular state, and which state has the most/lease user login. 
 
+### Archetecure
+```mermaid
+graph LR;
+    t1[(user-login)]-->Consumer-->Producer-->t2[(processed-user-login)]-->analysis-consumer;
+```
+
 ### Design Choices
-1. Architecture
-Kafka is chosen as the core messaging system due to its ability to handle real-time, high-throughput data. Docker Compose is used to orchestrate the Kafka, Zookeeper, producer, and consumer services, ensuring reproducibility. The data processing logic is implemented in Python for flexibility and ease of integration with other tools.
-2. Topics
-user-login: Stores raw login events.
+1. Topics
+user-login: Stores raw login events produced by upstream sources.
 processed-user-login: Stores processed login events, such as data enriched with locale-based aggregation or IP validation.
 3. Consumer and Producer
 The Kafka consumer reads messages from the user-login topic and processes them with Python. The processed messages are published to the processed-user-login topic using a Kafka producer.

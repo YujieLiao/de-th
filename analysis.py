@@ -1,7 +1,6 @@
-from confluent_kafka import Consumer, Producer, KafkaException, KafkaError
+from confluent_kafka import Consumer, KafkaException, KafkaError
 import json
 import time
-import csv
 from collections import defaultdict
 
 consumer_conf = {
@@ -14,6 +13,14 @@ consumer.subscribe([topic])
 
 
 def get_message(message):
+    """_summary_
+
+    Args:
+        message (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     try:
         data = json.loads(message.value().decode('utf-8'))
         app_version_dict_new = data.get('app_version')
@@ -36,10 +43,7 @@ if __name__ == "__main__":
             if msg is None:
                 continue
             if msg.error():
-                if msg.error().code() == KafkaError._PARTITION_EOF:
-                    print(f"End of partition reached {msg.partition} {msg.offset}")
-                else:
-                    raise KafkaException(msg.error())
+                break
             else:
                 app_version_dict_new, locale_dict_new, device_type_dict_new = get_message(message=msg)  
                 for key, value in app_version_dict_new.items():
