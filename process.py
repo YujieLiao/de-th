@@ -1,4 +1,4 @@
-from confluent_kafka import Consumer, Producer, KafkaException, KafkaError
+from confluent_kafka import Consumer, Producer
 import json
 import time
 from collections import defaultdict
@@ -20,13 +20,8 @@ consumer.subscribe(["user-login"])
 
 
 def get_message(message):
-    """_summary_
-
-    Args:
-        message (_type_): _description_
-
-    Returns:
-        _type_: _description_
+    """
+    This function takes a message from consumer and grab each field.
     """
     try:
         data = json.loads(message.value().decode("utf-8"))
@@ -55,6 +50,9 @@ def get_message(message):
 
 
 def process_message(app_version_dict, locale_dict, device_type_dict):
+    """
+    This function takes three dictionary in the current batcha and publish them to processed-user-login topic.
+    """
     combined_dict = {
         "app_version": app_version_dict,
         "locale": locale_dict,
@@ -74,7 +72,7 @@ if __name__ == "__main__":
     cnt = 0
 
     try:
-        while cnt < 20:
+        while cnt < 100:
             cnt += 1
             msg = consumer.poll(timeout=1.0)
             if msg is None:
@@ -88,7 +86,7 @@ if __name__ == "__main__":
                 app_version_dict[app_version] += 1
                 locale_dict[locale] += 1
                 device_type_dict[device_type] += 1
-            if cnt == 20:
+            if cnt == 100:
                 process_message(app_version_dict, locale_dict, device_type_dict)
                 cnt = 0
                 app_version_dict = defaultdict(int)
